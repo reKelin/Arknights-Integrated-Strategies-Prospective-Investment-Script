@@ -19,8 +19,9 @@
     "百炼嘉维尔": {
         "class": "近卫",
         "cost": 22,
-        "skill_id": 1,
-        "skill_click": false,
+        "skill_id": 2,
+        "skill_cd": 14,
+        "skill_click": true,
         "recruit": "干员-百炼嘉维尔1",
         "assist": "干员-百炼嘉维尔2"
     },
