@@ -1,58 +1,58 @@
 {
-    "É½": {
-        "class": "½üÎÀ",
+    "å±±": {
+        "class": "è¿‘å«",
         "cost": 11,
         "skill_id": 2,
         "skill_cd": 8,
         "skill_click": true,
-        "recruit": "¸ÉÔ±-É½1",
-        "assist": "¸ÉÔ±-É½2"
+        "recruit": "å¹²å‘˜-å±±1",
+        "assist": "å¹²å‘˜-å±±2"
     },
-    "»Í": {
-        "class": "½üÎÀ",
+    "ç…Œ": {
+        "class": "è¿‘å«",
         "cost": 22,
         "skill_id": 2,
         "skill_click": false,
-        "recruit": "¸ÉÔ±-»Í1",
-        "assist": "¸ÉÔ±-»Í2"
+        "recruit": "å¹²å‘˜-ç…Œ1",
+        "assist": "å¹²å‘˜-ç…Œ2"
     },
-    "°ÙÁ¶¼ÎÎ¬¶û": {
-        "class": "½üÎÀ",
+    "ç™¾ç‚¼å˜‰ç»´å°”": {
+        "class": "è¿‘å«",
         "cost": 22,
         "skill_id": 2,
         "skill_cd": 14,
         "skill_click": true,
-        "recruit": "¸ÉÔ±-°ÙÁ¶¼ÎÎ¬¶û1",
-        "assist": "¸ÉÔ±-°ÙÁ¶¼ÎÎ¬¶û2"
+        "recruit": "å¹²å‘˜-ç™¾ç‚¼å˜‰ç»´å°”1",
+        "assist": "å¹²å‘˜-ç™¾ç‚¼å˜‰ç»´å°”2"
     },
-    "ÓğÃ«±Ê": {
-        "class": "½üÎÀ",
+    "ç¾½æ¯›ç¬”": {
+        "class": "è¿‘å«",
         "cost": 20,
         "skill_id": 1,
         "skill_click": false,
-        "recruit": "¸ÉÔ±-ÓğÃ«±Ê1",
-        "assist": "¸ÉÔ±-ÓğÃ«±Ê2"
+        "recruit": "å¹²å‘˜-ç¾½æ¯›ç¬”1",
+        "assist": "å¹²å‘˜-ç¾½æ¯›ç¬”2"
     },
-    "º£Ä­": {
-        "class": "½üÎÀ",
+    "æµ·æ²«": {
+        "class": "è¿‘å«",
         "cost": 20,
         "skill_id": 1,
         "skill_click": false,
-        "recruit": "¸ÉÔ±-º£Ä­1",
-        "assist": "¸ÉÔ±-º£Ä­2"
+        "recruit": "å¹²å‘˜-æµ·æ²«1",
+        "assist": "å¹²å‘˜-æµ·æ²«2"
     },
-    "è÷À¼": {
-        "class": "¸¨Öú",
+    "æ¢“å…°": {
+        "class": "è¾…åŠ©",
         "cost": 10,
         "skill_id": 1,
         "skill_click": false,
-        "recruit": "¸ÉÔ±-è÷À¼1"
+        "recruit": "å¹²å‘˜-æ¢“å…°1"
     },
-    "°²Èü¶û": {
-        "class": "Ò½ÁÆ",
+    "å®‰èµ›å°”": {
+        "class": "åŒ»ç–—",
         "cost": 15,
         "skill_id": 1,
         "skill_click": false,
-        "recruit": "¸ÉÔ±-°²Èü¶û1"
+        "recruit": "å¹²å‘˜-å®‰èµ›å°”1"
     }
 }

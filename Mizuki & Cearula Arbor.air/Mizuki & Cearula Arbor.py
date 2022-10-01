@@ -65,13 +65,13 @@ def swipe_screen():
 
 class Auto_Prospective_Investment:
     def __init__(self):
-        with open('defualt_setting.json', encoding='gbk') as f:
+        with open('defualt_setting.json', encoding='utf-8') as f:
             data = json.load(f)
             self.guard_operator_exist = data['guard_operator_exist']
             ''' 是否有核心近卫 '''
             squad = data['squad']
             ''' 编队 = [近卫, 辅助, 医疗]，近卫非空，其余无所谓（如果能过的话） '''
-        operator = json.load(open('operator.json', encoding='gbk'))
+        operator = json.load(open('operator.json', encoding='utf-8'))
         squad = [operator[name] for name in squad[:3]]
         for info in squad:
             for str in ['recruit', 'assist']:
@@ -84,7 +84,7 @@ class Auto_Prospective_Investment:
         def trans(a, prefix, rgb=False):
             return {name: template(prefix + name, rgb=rgb) for name in a}
 
-        with open('operation_tasks.json', encoding='gbk') as f:
+        with open('operation_tasks.json', encoding='utf-8') as f:
             self.operation_task = json.load(f)
             ''' 作战关卡操作 '''
 
