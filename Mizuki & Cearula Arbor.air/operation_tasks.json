@@ -2,61 +2,61 @@
     "射手部队": {
         "近卫": {
             "place": [1520, 440],
-            "direction": [-100, 0],
+            "direction": [0, 1],
             "click": [1440, 470]
         },
         "辅助": {
             "place": [1400, 420],
-            "direction": [-100, 0]
+            "direction": [-1, 0]
         },
         "医疗": {
             "place": [1100, 460],
-            "direction": [100, 0]
+            "direction": [1, 0]
         }
     },
     "共生": {
         "近卫": {
             "place": [1080, 600],
-            "direction": [0, -100],
+            "direction": [0, -1],
             "click": [950, 620]
         },
         "辅助": {
             "place": [1250, 580],
-            "direction": [-100, 0]
+            "direction": [-1, 0]
         },
         "医疗": {
             "place": [1400, 580],
-            "direction": [-100, 0]
+            "direction": [-1, 0]
         }
     },
     "蓄水池": {
         "近卫": {
             "place": [1450, 680],
-            "direction": [-100, 0],
+            "direction": [-1, 0],
             "click": [1300, 720]
         },
         "辅助": {
             "place": [1420, 500],
-            "direction": [-100, 0]
+            "direction": [-1, 0]
         },
         "医疗": {
             "place": [1400, 380],
-            "direction": [0, 100]
+            "direction": [0, 1]
         }
     },
     "虫群横行": {
         "近卫": {
             "place": [1570, 560],
             "direction": [1370, 570],
-            "click": [-100, 0]
+            "click": [-1, 0]
         },
         "辅助": {
             "place": [1240, 440],
-            "direction": [0, 100]
+            "direction": [0, 1]
         },
         "医疗": {
             "place": [1380, 440],
-            "direction": [0, 100]
+            "direction": [0, 1]
         }
     }
 }
