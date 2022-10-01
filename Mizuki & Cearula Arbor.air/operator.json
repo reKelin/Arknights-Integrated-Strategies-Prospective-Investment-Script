@@ -1,0 +1,57 @@
+{
+    "山": {
+        "class": "近卫",
+        "cost": 11,
+        "skill_id": 2,
+        "skill_cd": 8,
+        "skill_click": true,
+        "recruit": "干员-山1",
+        "assist": "干员-山2"
+    },
+    "煌": {
+        "class": "近卫",
+        "cost": 22,
+        "skill_id": 2,
+        "skill_click": false,
+        "recruit": "干员-煌1",
+        "assist": "干员-煌2"
+    },
+    "百炼嘉维尔": {
+        "class": "近卫",
+        "cost": 22,
+        "skill_id": 1,
+        "skill_click": false,
+        "recruit": "干员-百炼嘉维尔1",
+        "assist": "干员-百炼嘉维尔2"
+    },
+    "羽毛笔": {
+        "class": "近卫",
+        "cost": 20,
+        "skill_id": 1,
+        "skill_click": false,
+        "recruit": "干员-羽毛笔1",
+        "assist": "干员-羽毛笔2"
+    },
+    "海沫": {
+        "class": "近卫",
+        "cost": 20,
+        "skill_id": 1,
+        "skill_click": false,
+        "recruit": "干员-海沫1",
+        "assist": "干员-海沫2"
+    },
+    "梓兰": {
+        "class": "辅助",
+        "cost": 10,
+        "skill_id": 1,
+        "skill_click": false,
+        "recruit": "干员-梓兰1"
+    },
+    "安赛尔": {
+        "class": "医疗",
+        "cost": 15,
+        "skill_id": 1,
+        "skill_click": false,
+        "recruit": "干员-安赛尔1"
+    }
+}
