@@ -1,20 +1,25 @@
 import json
 import logging
+import threading
 import airtest.core.api as air
 
-# logging.getLogger("airtest").setLevel(logging.INFO)
+logging.getLogger("airtest").setLevel(logging.INFO)
 
 air.auto_setup(__file__)
 air.ST.FIND_TIMEOUT_TMP = 1
+# air.ST.SAVE_IMAGE = False
 
-resolution = air.G.DEVICE.get_current_resolution()
+# resolution = air.G.DEVICE.get_current_resolution()
+resolution = [1920, 1080]
 ''' 默认分辨率 = 1920 * 1080 '''
 NOP = (700, 900)
 ''' 无操作 / 确定 '''
+default_sleep_time = .6
+''' 如果设备太卡，可以调大一点 '''
 
 
 def trans_position(p):
-    """ 数值都是根据默认分辨率设置的，修改分辨率后需要重新计算坐标 """
+    """ 数值都是根据默认分辨率设置的，对于不同分辨率的设备需要重新计算坐标 """
     return (p[0] * resolution[0] / 1920, p[1] * resolution[1] / 1080)
 
 
@@ -25,6 +30,7 @@ def touch(p, times=1):
         air.touch(trans_position(p), times=times)
     else:
         air.touch(p, times=times)
+    sleep(default_sleep_time)
 
 
 def exists(img):
@@ -63,14 +69,46 @@ def swipe_screen():
     sleep(1)
 
 
+class MyThread(threading.Thread):
+    def __init__(self, func, args=()):
+        super(MyThread, self).__init__()
+        self.func = func
+        self.args = args
+
+    def run(self):
+        self.result = self.func(*self.args)
+
+    def get_result(self):
+        return self.result
+
+
+def check(dict):
+    def check(name, img):
+        return name if exists(img) else None
+
+    dic = list(dict.items())
+    if len(dic) > 4:
+        for name, img in dic[:2]:
+            res = check(name, img)
+            if res is not None:
+                return [res]
+        dic = dic[2:]
+    threads = [MyThread(check, args=item) for item in dic]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    res = [t.get_result() for t in threads]
+    return [v for v in res if v if not None]
+
+
 class Auto_Prospective_Investment:
     def __init__(self):
-        with open('defualt_setting.json', encoding='utf-8') as f:
-            data = json.load(f)
-            self.guard_operator_exist = data['guard_operator_exist']
-            ''' 是否有核心近卫 '''
-            squad = data['squad']
-            ''' 编队 = [近卫, 辅助, 医疗]，近卫非空，其余无所谓（如果能过的话） '''
+        self.guard_operator_exist = True
+        ''' 是否有核心近卫，默认为有 '''
+        squad = json.load(open('default_setting.json',
+                               encoding='utf-8'))['squad']
+        ''' 编队 = [近卫, 辅助, 医疗]，第一层实际上只要单近卫就行了 '''
         operator = json.load(open('operator.json', encoding='utf-8'))
         squad = [operator[name] for name in squad[:3]]
         for info in squad:
@@ -78,17 +116,16 @@ class Auto_Prospective_Investment:
                 if str in info:
                     info[str] = template(info[str], threshold=.8)
             info['class_img'] = template('职业-' + info['class'], threshold=.3)
-        squad.extend([None] * (3 - len(squad)))
         self.squad = squad
 
         def trans(a, prefix, rgb=False):
             return {name: template(prefix + name, rgb=rgb) for name in a}
 
-        with open('operation_tasks.json', encoding='utf-8') as f:
-            self.operation_task = json.load(f)
-            ''' 作战关卡操作 '''
+        self.operation_task = json.load(
+            open('operation_tasks.json', encoding='utf-8'))
+        ''' 作战关卡操作 '''
 
-        node_list = ['不期而遇', '地区委托', '作战', '紧急作战', '诡意行商', '兴致盎然', '得偿所愿']
+        node_list = ['不期而遇', '作战', '地区委托', '兴致盎然', '得偿所愿', '诡意行商', '紧急作战']
         self.node_list = trans(node_list, '节点-', rgb=True)
         ''' 节点名称列表 '''
 
@@ -103,28 +140,28 @@ class Auto_Prospective_Investment:
     def run(self):
         while (True):
             # 开始探索
-            air.wait(template('探索'))
-            touch((1740, 880))
+            air.wait(template('开始探索'))
+            touch((1740, 880))  # 开始探索
             sleep(1)
+            # 如果存在更多支援
+            if exists('更多支援'):
+                touch((1000, 800))
+                touch((1000, 800))
+                try_touch('确认-藏品')
             # 选择指挥分队
-            touch((1540, 872))
-            sleep(.6)
-            touch((1540, 872))
-            sleep(.6)
+            touch((1540, 872))  # 指挥分队
+            touch((1540, 872))  # 确认
             # 选择取长补短
-            touch((1173, 875))
-            sleep(.6)
-            touch((1173, 875))
-            sleep(1)
+            touch((1173, 875))  # 取长补短
+            touch((1173, 875))  # 确认
             # 招募干员
             self.recruit_operators()
             # 探索海洋
-            touch((1800, 540))
+            touch((1800, 540))  # 探索海洋
             # 调整编队
             self.adjust_squad()
             # 第一关
-            touch((600, 500))
-            sleep(.5)
+            touch((600, 480))  # 第一关
             self.start_operation()
             # 遍历后续节点
             while self.next_step():
@@ -133,143 +170,119 @@ class Auto_Prospective_Investment:
             if try_touch('退出'):
                 sleep(.5)
                 touch('放弃本次探索')
-                sleep(.5)
                 touch('确定-放弃')
             # 结算
             air.wait(template('下一步'))
             touch('下一步')
-            #             air.wait(template('确定-结算'))
-            #             touch('确定-结算')
             touch(NOP, times=30)
 
-    def quit_recruit(self):
-        while try_touch('放弃'):
+    def quit_recruit(self, times=3):
+        while times > 0 and try_touch('放弃'):
+            times -= 1
             sleep(.5)
             touch('确定-放弃')
-            sleep(1)
 
     def recruit_operators(self):
-        skip = (1830, 60)
-        sleep_time = .6  # 网络不好调大点
+        skip = (1830, 60)  # skip
 
         def recruit(recruit, operator, assist=False):
             touch(recruit)  # 招募券
-            sleep(sleep_time)
             if operator is None:
-                self.quit_recruit()
+                self.quit_recruit(1)
                 return
             cnt = 0
+            if not assist:
+                op = operator['recruit']
+                while cnt < 4 and not try_touch(op):
+                    swipe_screen()
+                    cnt += 1
+                if cnt >= 4:
+                    assist = True
+                    self.guard_operator_exist = False
+                else:
+                    touch((1800, 1000))  # 确认招募
             if assist:
                 touch((1600, 50))  # 选择助战
                 sleep(.5)
-                operator = operator['assist']
-                while not try_touch(operator) and cnt < 7:
+                op = operator['assist']
+                while cnt < 7 and not try_touch(op):
                     touch((1800, 50))  # 更新助战列表
-                    sleep(4)
-                if cnt > 7:
-                    touch((140, 50))
-                    sleep(.3)
-                    self.quit_recruit()
-                    return
-                sleep(sleep_time)
-                touch((1200, 770))  # 确认招募
-            else:
-                operator = operator['recruit']
-                while not try_touch(operator) and cnt < 4:
-                    swipe_screen()
+                    sleep(3)
                     cnt += 1
-                if cnt > 3:
-                    self.quit_recruit()
+                if cnt >= 7:
+                    touch((140, 50))  # 退出
+                    self.quit_recruit(1)
                     return
-                sleep(sleep_time)
-                touch((1800, 1000))  # 确认招募
-            sleep(sleep_time)
+                sleep(1)
+                touch((1200, 770))  # 确认招募
             touch(skip)
-            sleep(sleep_time)
             touch(skip)
-            sleep(sleep_time / 2)
 
-        for i in range(3):
-            recruit((530 + 435 * i, 800), self.squad[i], i == 0
-                    and not self.guard_operator_exist)
+        recruit((530, 800), self.squad[0], not self.guard_operator_exist)
+        recruit((965, 800), None if len(self.squad) < 2 else self.squad[1])
+        recruit((1400, 800), None if len(self.squad) < 3 else self.squad[2])
         return
 
     def adjust_squad(self):
         """ 调整编队 """
         air.wait(template('编队'))
-        sleep(1)
+        sleep(.5)
         touch((1660, 1000))  # 编队
-        sleep(.3)
         touch((1500, 60))  # 快捷编队
-        sleep(.3)
         touch((800, 200))  # 近卫
-        sleep(.3)
         if self.squad[0]['skill_id'] == 2:
             touch((300, 800))  # 切换2技能
-            sleep(.3)
-        touch((800, 400))  # 安塞尔 or 梓兰
-        sleep(.3)
-        touch((800, 600))  # 梓兰 or 安塞尔
-        sleep(.3)
+        if len(self.squad) > 1:
+            touch((800, 400))  # 安塞尔
+            if len(self.squad) > 2:
+                touch((800, 600))  # 梓兰
         touch((1700, 1000))  # 确认
-        sleep(.3)
         touch((140, 50))  # 返回
         return
 
     def next_step(self):
-        sleep(2)
-        for name, img in self.node_list.items():
-            if try_touch(img):
-                sleep(.5)
-                if name == '不期而遇':
-                    self.excounter_chance_meeting()
-                elif name == '地区委托':
-                    self.excounter_regional_entrustment()
-                elif name == '兴致盎然':
-                    self.downtime_recreation()
-                elif name == '得偿所愿':
-                    self.excounter_wish_fulfillment()
-                elif name == '诡意行商':
-                    self.rogue_trader()
+        sleep(1.7)
+        for name in check(self.node_list):
+            touch(self.node_list[name])
+            if name == '不期而遇':
+                self.excounter_chance_meeting()
+            elif name == '地区委托':
+                self.excounter_regional_entrustment()
+            elif name == '兴致盎然':
+                self.downtime_recreation()
+            elif name == '得偿所愿':
+                self.excounter_wish_fulfillment()
+            elif name == '诡意行商':
+                self.rogue_trader()
+                return False
+            elif name == '作战' or name == '紧急作战':
+                if self.start_operation():
                     return False
-                elif name == '作战' or name == '紧急作战':
-                    if self.start_operation():
-                        return False
-                return True
+            return True
         return False
 
     def start_operation(self):
         """ 开始行动 """
-        result = None
-        for name, img in self.operation_list.items():
-            if air.exists(img):
-                result = name
-                break
-        if result is None:
+        res = check(self.operation_list)
+        if len(res) == 0:
             return True
+        res = res[0]
         touch('出发前往')
-        sleep(1)
         touch('开始行动')
-        sleep(.5)
         try_touch('确定-钥匙')
         speed = template('2倍速')
         air.wait(speed)
         sleep(2)
         air.touch(speed)
-        sleep(.5)
         cost = 12
         for op in self.squad:
-            if op is None:
-                continue
-            sleep(max(0, op['cost'] - cost) / 2)
-            position = air.exists(op['class_img'])
+            position = exists(op['class_img'])  # 找到职业图标
             if position is False:
-                touch((110, 80))
-                sleep(.5)
-                touch((1100, 520))
-                sleep(.5)
+                touch((110, 80))  # 设置
+                touch((1100, 520))  # 放弃行动
                 return True
-            task = self.operation_task[result][op['class']]
+            sleep(max(0, op['cost'] - cost) / 2)  # 等费用
+            task = self.operation_task[res][op['class']]  # 某职业干员在该关卡的操作信息
             place = trans_position(task['place'])
             air.swipe(position, place, duration=.2)  # 拖干员到位置
             dx, dy = task['direction']
@@ -277,11 +290,11 @@ class Auto_Prospective_Investment:
             air.swipe(place, dst, duration=.1)  # 设置朝向
             cost += 8 - op['cost']
             if op['skill_click'] and 'click' in task:
-                sleep(op['skill_cd'] / 2)
+                sleep(op['skill_cd'] / 2)  # 等技能cd
                 cost += op['skill_cd'] + 3
                 touch(task['click'])  # 点击干员
                 touch((1300, 600))  # 开技能
-        sleep(40)  # 等待战斗结束
+        sleep(55)  # 等待战斗结束
         while not exists('成功通过'):
             sleep(5)
             if try_touch('联系中断'):
@@ -290,30 +303,24 @@ class Auto_Prospective_Investment:
         touch(NOP)
         sleep(1)
         touch('收下源石锭')
-        sleep(.5)
+        sleep(1.5)
         while not try_touch('不要了走了'):
             swipe_screen()
-        sleep(.5)
         touch('确定-离开')
-        sleep(.5)
         return False
 
     def excounter_chance_meeting(self):
         """ 不期而遇 """
         touch('出发前往')
-        sleep(1.5)
-        touch(NOP, times=2)
-        sleep(1.5)
-        found = False
-        for img in self.option_list.values():
-            if try_touch(img):
-                found = True
-                break
-        if not found:
-            touch((1800, 600))
-        sleep(.5)
-        touch('确定-选择')
         sleep(1)
+        touch(NOP, times=5)
+        sleep(1)
+        res = check(self.option_list)
+        if len(res) == 0:
+            touch((1800, 600))
+        else:
+            touch(self.option_list[res[0]])
+        touch('确定-选择')
         touch(NOP, times=15)
         self.quit_recruit()
         touch(NOP, times=15)
@@ -323,9 +330,8 @@ class Auto_Prospective_Investment:
         touch('出发前往')
         sleep(1)
         touch(NOP, times=2)
-        sleep(1.5)
+        sleep(1)
         touch('收藏品')
-        sleep(.5)
         touch('确定-选择')
         air.wait(template('确定-投掷'))
         touch('确定-投掷')
@@ -339,26 +345,22 @@ class Auto_Prospective_Investment:
         """ 兴致盎然 """
         touch('出发前往')
         sleep(1)
-        touch(NOP, times=2)
-        sleep(1.5)
+        touch(NOP, times=5)
         touch('选择-离开')
-        sleep(.5)
         touch('确定-选择')
-        sleep(1)
+        touch(NOP, times=5)
         touch('选择-源石锭')
-        sleep(1)
         touch('确定-选择')
+        touch(NOP, times=5)
 
     def excounter_regional_entrustment(self):
         """ 地区委托 """
         touch('出发前往')
         sleep(1)
         touch(NOP, times=2)
-        sleep(1.5)
+        sleep(1)
         touch('选择-离开')
-        sleep(.5)
         touch('确定-选择')
-        sleep(.5)
         touch(NOP, times=15)
 
     def rogue_trader(self):
@@ -366,12 +368,10 @@ class Auto_Prospective_Investment:
         touch('出发前往')
         sleep(1)
         if try_touch('前瞻性投资系统'):
-            sleep(.5)
             touch('投资入口')
-            sleep(.5)
-            touch((1400, 740), times=50)
-            sleep(1)
+            touch((1400, 740), times=50)  # 确认投资
 
 
 script = Auto_Prospective_Investment()
 script.run()
+

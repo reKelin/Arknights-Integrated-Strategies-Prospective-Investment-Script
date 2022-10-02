@@ -8,6 +8,14 @@
         "recruit": "干员-山1",
         "assist": "干员-山2"
     },
+    "耀骑士临光": {
+        "class": "近卫",
+        "cost": 19,
+        "skill_id": 1,
+        "skill_click": false,
+        "recruit": "干员-耀骑士临光1",
+        "assist": "干员-耀骑士临光2"
+    },
     "煌": {
         "class": "近卫",
         "cost": 22,
