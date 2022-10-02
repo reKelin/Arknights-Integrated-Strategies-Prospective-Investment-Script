@@ -7,10 +7,9 @@ logging.getLogger("airtest").setLevel(logging.INFO)
 
 air.auto_setup(__file__)
 air.ST.FIND_TIMEOUT_TMP = 1
-# air.ST.SAVE_IMAGE = False
+air.ST.SAVE_IMAGE = False
 
-# resolution = air.G.DEVICE.get_current_resolution()
-resolution = [1920, 1080]
+resolution = air.G.DEVICE.get_current_resolution()
 ''' 默认分辨率 = 1920 * 1080 '''
 NOP = (700, 900)
 ''' 无操作 / 确定 '''
