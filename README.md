@@ -48,5 +48,5 @@
 
      遇到脚本卡死或者其他特殊情况，点击“停止脚本”或按 Shift+F5 停止运行脚本。
 
-     <img src="https://github.com/reKelin/Arknights-Integrated-Strategies-Prospective-Investment-Script/blob/main/readme_files/运行脚本.png"/>
+     <img src="https://github.com/reKelin/Arknights-Integrated-Strategies-Prospective-Investment-Script/blob/main/readme_files/停止运行.png"/>
 
