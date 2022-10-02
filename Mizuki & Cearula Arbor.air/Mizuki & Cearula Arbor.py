@@ -138,16 +138,18 @@ class Auto_Prospective_Investment:
         ''' 关卡名称列表 '''
 
     def run(self):
+        support = True  # 更多支援
         while (True):
             # 开始探索
             air.wait(template('开始探索'))
             touch((1740, 880))  # 开始探索
             sleep(1)
             # 如果存在更多支援
-            if exists('更多支援'):
+            if support and exists('更多支援'):
                 touch((1000, 800))
                 touch((1000, 800))
                 try_touch('确认-藏品')
+                support = False
             # 选择指挥分队
             touch((1540, 872))  # 指挥分队
             touch((1540, 872))  # 确认
@@ -374,4 +376,3 @@ class Auto_Prospective_Investment:
 
 script = Auto_Prospective_Investment()
 script.run()
-
