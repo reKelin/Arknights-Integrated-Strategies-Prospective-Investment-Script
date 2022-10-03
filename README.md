@@ -52,3 +52,14 @@
 
      <img src="https://github.com/reKelin/Arknights-Integrated-Strategies-Prospective-Investment-Script/blob/main/readme_files/停止运行.png"/>
 
+## 注意事项
+
+1.   分辨率太奇怪了（超宽屏，超窄屏）作战中的定位点会出错，目前主流的模拟器的默认分辨率都能够较好的支持。
+
+2.   如果出现 BUG ，可以按如下方式点击或按 Ctrl+L 生成报告。
+
+     <img src="https://github.com/reKelin/Arknights-Integrated-Strategies-Prospective-Investment-Script/blob/main/readme_files/打开报告.png"/>
+
+     然后将报告中的错误信息截图，提交 issues ，截图示例如下：
+
+     <img src="https://github.com/reKelin/Arknights-Integrated-Strategies-Prospective-Investment-Script/blob/main/readme_files/BUG截图示例.png"/>
