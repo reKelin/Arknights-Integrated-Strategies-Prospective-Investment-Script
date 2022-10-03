@@ -24,13 +24,15 @@
 
      <img src="https://github.com/reKelin/Arknights-Integrated-Strategies-Prospective-Investment-Script/blob/main/readme_files/肉鸽主界面示例.png" />
 
-1.   可以在 .air 目录下查看 default_setting.json ，表示默认编队。
+1.   可以在 .air 目录下查看默认配置文件 default_setting.json ，包含默认编队和默认等待时间，如下图所示：
 
-     <img src="https://github.com/reKelin/Arknights-Integrated-Strategies-Prospective-Investment-Script/blob/main/readme_files/default_setting1.png">
+     <img src="https://github.com/reKelin/Arknights-Integrated-Strategies-Prospective-Investment-Script/blob/main/readme_files/默认配置1.png">
 
-     但是实际上第一层普通难度非常简单，正常情况下单近卫即可通关，所以实际上默认编队为
+     默认等待时间表示一次点击后的等待时间，单位为秒。如果设备比较卡，建议调大一点，比如 1 。
 
-     <img src="https://github.com/reKelin/Arknights-Integrated-Strategies-Prospective-Investment-Script/blob/main/readme_files/default_setting2.png">
+     由于实际上第一层普通难度非常简单，正常情况下单近卫即可通关，所以实际上默认配置为
+
+     <img src="https://github.com/reKelin/Arknights-Integrated-Strategies-Prospective-Investment-Script/blob/main/readme_files/默认配置2.png">
 
      如果无需修改编队，可以直接跳到下一点阅读。
 
