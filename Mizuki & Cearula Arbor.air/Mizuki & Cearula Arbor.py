@@ -55,7 +55,7 @@ def template(name, threshold=None, rgb=False):
     return air.Template(r'%s' % ('images\\' + name + '.png'),
                         threshold=threshold,
                         rgb=rgb,
-                        resolution=resolution)
+                        resolution=[1920, 1080])
 
 
 def sleep(time):
@@ -275,7 +275,7 @@ class Auto_Prospective_Investment:
         air.wait(speed)
         sleep(2)
         air.touch(speed)
-        cost = 12
+        cost = 10
         for op in self.squad:
             position = exists(op['class_img'])  # 找到职业图标
             if position is False:
@@ -292,8 +292,8 @@ class Auto_Prospective_Investment:
             cost += 8 - op['cost']
             if op['skill_click'] and 'click' in task:
                 sleep(op['skill_cd'] / 2)  # 等技能cd
-                cost += op['skill_cd'] + 3
-                touch(task['click'])  # 点击干员
+                cost += op['skill_cd'] + 2
+                touch(trans_position(task['click']))  # 点击干员
                 touch((1300, 600))  # 开技能
         sleep(55)  # 等待战斗结束
         while not exists('成功通过'):
