@@ -330,6 +330,7 @@ class AutoProspectiveInvestment:
         while not try_touch('不要了走了'):
             swipe_screen()
         touch('确定-离开')
+        sleep(1)
         return False
 
     def excounter_chance_meeting(self):
