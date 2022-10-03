@@ -170,6 +170,7 @@ class AutoProspectiveInvestment:
             touch(combination)  # 确认
             # 招募干员
             self.recruit_operators()
+            sleep(default_sleep_time * 2)
             # 探索海洋
             touch((1800, 540))  # 探索海洋
             # 调整编队
@@ -329,6 +330,7 @@ class AutoProspectiveInvestment:
         sleep(1.5)
         while not try_touch('不要了走了'):
             swipe_screen()
+        sleep(1)
         touch('确定-离开')
         sleep(1)
         return False
