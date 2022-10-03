@@ -261,7 +261,7 @@ class AutoProspectiveInvestment:
         return
 
     def next_step(self):
-        sleep(default_sleep_time * 4)
+        sleep(default_sleep_time * 5)
         for name in check(self.node_list):
             touch(self.node_list[name])
             if name == '不期而遇':
