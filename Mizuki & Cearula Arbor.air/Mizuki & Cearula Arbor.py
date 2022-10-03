@@ -311,7 +311,7 @@ class AutoProspectiveInvestment:
             cost += 8 - op['cost']
             if op['skill_click']:
                 cost += op['skill_cd'] + 2
-                skill = template('技能', rgb=True)
+                skill = template('技能')
                 air.wait(skill)
                 pos = exists(skill)
                 pos = pos[0], pos[1] + 0.1 * resolution[1]
@@ -398,3 +398,4 @@ class AutoProspectiveInvestment:
 
 script = AutoProspectiveInvestment()
 script.run()
+
