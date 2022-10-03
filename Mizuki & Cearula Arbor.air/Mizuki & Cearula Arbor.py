@@ -313,7 +313,7 @@ class AutoProspectiveInvestment:
                 skill = template('技能')
                 air.wait(skill)
                 pos = exists(skill)
-                pos[1] += 0.06 * resolution[1]
+                pos = pos[0], pos[1] + 0.1 * resolution[1]
                 touch(pos)  # 点击干员
                 touch((1300, 600))  # 开技能
         sleep(55)  # 等待战斗结束
@@ -397,3 +397,4 @@ class AutoProspectiveInvestment:
 
 script = AutoProspectiveInvestment()
 script.run()
+
