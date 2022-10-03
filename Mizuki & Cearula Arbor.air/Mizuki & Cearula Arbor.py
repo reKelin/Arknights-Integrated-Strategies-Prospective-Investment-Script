@@ -8,14 +8,16 @@ logging.getLogger("airtest").setLevel(logging.INFO)
 air.auto_setup(__file__)
 air.ST.FIND_TIMEOUT_TMP = 1
 # air.ST.SAVE_IMAGE = False
+air.ST.OPDELAY = json.load(open('default_setting.json',
+                                encoding='utf-8'))['default_sleep_time']
+''' 每一次点击后默认等待时间：如果设备太卡，可以调大一点 '''
+
+delay = air.ST.OPDELAY
 
 resolution = air.G.DEVICE.get_current_resolution()
 ''' 默认分辨率 = 1920 * 1080 '''
 NOP = (700, 900)
 ''' 无操作 / 确定 '''
-default_sleep_time = json.load(open('default_setting.json',
-                                    encoding='utf-8'))['default_sleep_time']
-''' 默认等待时间：如果设备太卡，可以调大一点 '''
 
 
 def trans_position(p):
@@ -23,14 +25,13 @@ def trans_position(p):
     return (p[0] * resolution[0] / 1920, p[1] * resolution[1] / 1080)
 
 
-def touch(p, times=1):
+def touch(p, **kwargs):
     if isinstance(p, str):
-        air.touch(template(p), times=times)
+        air.touch(template(p), **kwargs)
     elif isinstance(p, tuple):
-        air.touch(trans_position(p), times=times)
+        air.touch(trans_position(p), **kwargs)
     else:
-        air.touch(p, times=times)
-    sleep(default_sleep_time)
+        air.touch(p, **kwargs)
 
 
 def exists(img):
@@ -60,7 +61,7 @@ def template(name, threshold=None, rgb=False, target_pos=0):
                         resolution=[1920, 1080])
 
 
-def sleep(time=default_sleep_time):
+def sleep(time=air.ST.OPDELAY):
     air.sleep(time)
 
 
@@ -154,7 +155,7 @@ class AutoProspectiveInvestment:
             # 开始探索
             while not try_touch(start):
                 touch(NOP, times=5)
-            sleep(default_sleep_time * 2)
+            sleep(delay * 2)
             # 如果存在更多支援
             if support:
                 if exists('更多支援'):
@@ -169,8 +170,9 @@ class AutoProspectiveInvestment:
             touch(combination)  # 取长补短
             touch(combination)  # 确认
             # 招募干员
+            sleep(delay)
             self.recruit_operators()
-            sleep(default_sleep_time * 2)
+            sleep(delay * 2)
             # 探索海洋
             touch((1800, 540))  # 探索海洋
             # 调整编队
@@ -261,7 +263,7 @@ class AutoProspectiveInvestment:
         return
 
     def next_step(self):
-        sleep(default_sleep_time * 5)
+        sleep(delay * 5)
         for name in check(self.node_list):
             touch(self.node_list[name])
             if name == '不期而遇':
@@ -292,7 +294,7 @@ class AutoProspectiveInvestment:
         try_touch('确定-钥匙')
         speed = template('2倍速')
         air.wait(speed)
-        sleep(default_sleep_time * 4)
+        sleep(delay * 4)
         air.touch(speed)
         cost = 10
         for op in self.squad:
@@ -305,10 +307,10 @@ class AutoProspectiveInvestment:
             task = self.operation_task[res][op['class']]  # 某职业干员在该关卡的操作信息
             place = trans_position(task['place'])
             air.swipe(position, place,
-                      duration=default_sleep_time / 2)  # 拖干员到位置
+                      duration=delay / 2)  # 拖干员到位置
             dx, dy = task['direction']
             dst = (place[0] + dx * 200, place[1] + dy * 200)
-            air.swipe(place, dst, duration=default_sleep_time / 3)  # 设置朝向
+            air.swipe(place, dst, duration=delay / 3)  # 设置朝向
             cost += 8 - op['cost']
             if op['skill_click']:
                 cost += op['skill_cd'] + 2
@@ -348,10 +350,10 @@ class AutoProspectiveInvestment:
         else:
             touch(self.option_list[res[0]])
         touch('确定-选择')
-        touch(NOP, times=15)
+        touch(NOP, duration=1)
         if len(res) == 0 or res == '问号':
             self.quit_recruit()
-            touch(NOP, times=15)
+            touch(NOP, duration=1)
 
     def excounter_wish_fulfillment(self):
         """ 得偿所愿 """
@@ -364,23 +366,23 @@ class AutoProspectiveInvestment:
         touch('确定-选择')
         air.wait(template('确定-投掷'))
         touch('确定-投掷')
-        touch(NOP, times=15)
+        touch(NOP, duration=1)
         self.quit_recruit()
-        touch(NOP, times=15)
+        touch(NOP, duration=1)
         self.quit_recruit()
-        touch(NOP, times=15)
+        touch(NOP, duration=1)
 
     def downtime_recreation(self):
         """ 兴致盎然 """
         touch('出发前往')
         sleep(1)
-        touch(NOP, times=5)
+        touch(NOP, duration=.5)
         touch('选择-离开')
         touch('确定-选择')
-        touch(NOP, times=5)
+        touch(NOP, duration=.5)
         touch('选择-源石锭')
         touch('确定-选择')
-        touch(NOP, times=5)
+        touch(NOP, duration=.5)
 
     def excounter_regional_entrustment(self):
         """ 地区委托 """
@@ -390,7 +392,7 @@ class AutoProspectiveInvestment:
         sleep(1)
         touch('选择-离开')
         touch('确定-选择')
-        touch(NOP, times=15)
+        touch(NOP, duration=1)
 
     def rogue_trader(self):
         """  诡意行商前瞻性投资 """
@@ -398,9 +400,8 @@ class AutoProspectiveInvestment:
         sleep(1)
         if try_touch('前瞻性投资系统'):
             touch('投资入口')
-            touch((1400, 740), times=50)  # 确认投资
+            touch((1400, 740), duration=5)  # 确认投资
 
 
 script = AutoProspectiveInvestment()
 script.run()
-
