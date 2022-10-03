@@ -13,8 +13,9 @@ resolution = air.G.DEVICE.get_current_resolution()
 ''' 默认分辨率 = 1920 * 1080 '''
 NOP = (700, 900)
 ''' 无操作 / 确定 '''
-default_sleep_time = .6
-''' 如果设备太卡，可以调大一点 '''
+default_sleep_time = json.load(open('default_setting.json',
+                                    encoding='utf-8'))['default_sleep_time']
+''' 默认等待时间：如果设备太卡，可以调大一点 '''
 
 
 def trans_position(p):
@@ -51,14 +52,15 @@ def swipe(p1, p2, duration=1):
     air.swipe(p1, p2, duration)
 
 
-def template(name, threshold=None, rgb=False):
+def template(name, threshold=None, rgb=False, target_pos=0):
     return air.Template(r'%s' % ('images\\' + name + '.png'),
                         threshold=threshold,
                         rgb=rgb,
+                        target_pos=target_pos,
                         resolution=[1920, 1080])
 
 
-def sleep(time):
+def sleep(time=default_sleep_time):
     air.sleep(time)
 
 
@@ -117,8 +119,11 @@ class AutoProspectiveInvestment:
             info['class_img'] = template('职业-' + info['class'], threshold=.3)
         self.squad = squad
 
-        def trans(a, prefix, rgb=False):
-            return {name: template(prefix + name, rgb=rgb) for name in a}
+        def trans(a, prefix, rgb=False, targat=0):
+            return {
+                name: template(prefix + name, rgb=rgb, target_pos=targat)
+                for name in a
+            }
 
         self.operation_task = json.load(
             open('operation_tasks.json', encoding='utf-8'))
@@ -136,25 +141,33 @@ class AutoProspectiveInvestment:
         self.operation_list = trans(operation_list, '作战-')
         ''' 关卡名称列表 '''
 
+        recruitment = ['近卫', '辅助', '医疗']
+        self.recruitment = trans(recruitment, '招募券-', targat=8)
+        ''' 招募券 '''
+
     def run(self):
         support = True  # 更多支援
+        start = template('开始探索')
+        team = template('分队-指挥分队', target_pos=8)
+        combination = template('组合-取长补短', target_pos=8)
         while (True):
             # 开始探索
-            air.wait(template('开始探索'))
-            touch((1740, 880))  # 开始探索
-            sleep(1)
+            while not try_touch(start):
+                touch(NOP, times=5)
+            sleep(default_sleep_time * 2)
             # 如果存在更多支援
-            if support and exists('更多支援'):
-                touch((1000, 800))
-                touch((1000, 800))
-                try_touch('确认-藏品')
+            if support:
+                if exists('更多支援'):
+                    touch((1000, 800))
+                    touch((1000, 800))
+                    try_touch('确认-藏品')
                 support = False
             # 选择指挥分队
-            touch((1540, 872))  # 指挥分队
-            touch((1540, 872))  # 确认
+            touch(team)  # 指挥分队
+            touch(team)  # 确认
             # 选择取长补短
-            touch((1173, 875))  # 取长补短
-            touch((1173, 875))  # 确认
+            touch(combination)  # 取长补短
+            touch(combination)  # 确认
             # 招募干员
             self.recruit_operators()
             # 探索海洋
@@ -180,14 +193,16 @@ class AutoProspectiveInvestment:
     def quit_recruit(self, times=3):
         while times > 0 and try_touch('放弃'):
             times -= 1
-            sleep(.5)
+            sleep()
             touch('确定-放弃')
 
     def recruit_operators(self):
         skip = (1830, 60)  # skip
 
         def recruit(recruit, operator, assist=False):
+            air.wait(recruit)
             touch(recruit)  # 招募券
+            sleep()
             if operator is None:
                 self.quit_recruit(1)
                 return
@@ -219,15 +234,18 @@ class AutoProspectiveInvestment:
             touch(skip)
             touch(skip)
 
-        recruit((530, 800), self.squad[0], not self.guard_operator_exist)
-        recruit((965, 800), None if len(self.squad) < 2 else self.squad[1])
-        recruit((1400, 800), None if len(self.squad) < 3 else self.squad[2])
+        recruit(self.recruitment['近卫'], self.squad[0],
+                not self.guard_operator_exist)
+        recruit(self.recruitment['辅助'],
+                None if len(self.squad) < 2 else self.squad[1])
+        recruit(self.recruitment['医疗'],
+                None if len(self.squad) < 3 else self.squad[2])
         return
 
     def adjust_squad(self):
         """ 调整编队 """
         air.wait(template('编队'))
-        sleep(.5)
+        sleep()
         touch((1660, 1000))  # 编队
         touch((1500, 60))  # 快捷编队
         touch((800, 200))  # 近卫
@@ -242,7 +260,7 @@ class AutoProspectiveInvestment:
         return
 
     def next_step(self):
-        sleep(1.7)
+        sleep(default_sleep_time * 3.3)
         for name in check(self.node_list):
             touch(self.node_list[name])
             if name == '不期而遇':
@@ -273,7 +291,7 @@ class AutoProspectiveInvestment:
         try_touch('确定-钥匙')
         speed = template('2倍速')
         air.wait(speed)
-        sleep(2)
+        sleep(default_sleep_time * 4)
         air.touch(speed)
         cost = 10
         for op in self.squad:
@@ -285,15 +303,18 @@ class AutoProspectiveInvestment:
             sleep(max(0, op['cost'] - cost) / 2)  # 等费用
             task = self.operation_task[res][op['class']]  # 某职业干员在该关卡的操作信息
             place = trans_position(task['place'])
-            air.swipe(position, place, duration=.2)  # 拖干员到位置
+            air.swipe(position, place, duration=default_sleep_time / 2)  # 拖干员到位置
             dx, dy = task['direction']
             dst = (place[0] + dx * 200, place[1] + dy * 200)
-            air.swipe(place, dst, duration=.1)  # 设置朝向
+            air.swipe(place, dst, duration=default_sleep_time / 3)  # 设置朝向
             cost += 8 - op['cost']
-            if op['skill_click'] and 'click' in task:
-                sleep(op['skill_cd'] / 2)  # 等技能cd
+            if op['skill_click']:
                 cost += op['skill_cd'] + 2
-                touch(trans_position(task['click']))  # 点击干员
+                skill = template('技能')
+                air.wait(skill)
+                pos = exists(skill)
+                pos[1] += 0.06 * resolution[1]
+                touch(pos)  # 点击干员
                 touch((1300, 600))  # 开技能
         sleep(55)  # 等待战斗结束
         while not exists('成功通过'):
@@ -323,8 +344,9 @@ class AutoProspectiveInvestment:
             touch(self.option_list[res[0]])
         touch('确定-选择')
         touch(NOP, times=15)
-        self.quit_recruit()
-        touch(NOP, times=15)
+        if len(res) == 0 or res == '问号':
+            self.quit_recruit()
+            touch(NOP, times=15)
 
     def excounter_wish_fulfillment(self):
         """ 得偿所愿 """
