@@ -101,7 +101,7 @@ def check(dict):
     return [v for v in res if v if not None]
 
 
-class Auto_Prospective_Investment:
+class AutoProspectiveInvestment:
     def __init__(self):
         self.guard_operator_exist = True
         ''' 是否有核心近卫，默认为有 '''
@@ -373,5 +373,5 @@ class Auto_Prospective_Investment:
             touch((1400, 740), times=50)  # 确认投资
 
 
-script = Auto_Prospective_Investment()
+script = AutoProspectiveInvestment()
 script.run()
