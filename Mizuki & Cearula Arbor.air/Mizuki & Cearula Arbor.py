@@ -7,7 +7,7 @@ logging.getLogger("airtest").setLevel(logging.INFO)
 
 air.auto_setup(__file__)
 air.ST.FIND_TIMEOUT_TMP = 1
-air.ST.SAVE_IMAGE = False
+# air.ST.SAVE_IMAGE = False
 
 resolution = air.G.DEVICE.get_current_resolution()
 ''' 默认分辨率 = 1920 * 1080 '''
@@ -260,7 +260,7 @@ class AutoProspectiveInvestment:
         return
 
     def next_step(self):
-        sleep(default_sleep_time * 3.3)
+        sleep(default_sleep_time * 4)
         for name in check(self.node_list):
             touch(self.node_list[name])
             if name == '不期而遇':
@@ -303,18 +303,19 @@ class AutoProspectiveInvestment:
             sleep(max(0, op['cost'] - cost) / 2)  # 等费用
             task = self.operation_task[res][op['class']]  # 某职业干员在该关卡的操作信息
             place = trans_position(task['place'])
-            air.swipe(position, place, duration=default_sleep_time / 2)  # 拖干员到位置
+            air.swipe(position, place,
+                      duration=default_sleep_time / 2)  # 拖干员到位置
             dx, dy = task['direction']
             dst = (place[0] + dx * 200, place[1] + dy * 200)
             air.swipe(place, dst, duration=default_sleep_time / 3)  # 设置朝向
             cost += 8 - op['cost']
             if op['skill_click']:
                 cost += op['skill_cd'] + 2
-                skill = template('技能')
+                skill = template('技能', rgb=True)
                 air.wait(skill)
                 pos = exists(skill)
                 pos = pos[0], pos[1] + 0.1 * resolution[1]
-                touch(pos)  # 点击干员
+                air.touch(pos)  # 点击干员
                 touch((1300, 600))  # 开技能
         sleep(55)  # 等待战斗结束
         while not exists('成功通过'):
@@ -397,4 +398,3 @@ class AutoProspectiveInvestment:
 
 script = AutoProspectiveInvestment()
 script.run()
-
