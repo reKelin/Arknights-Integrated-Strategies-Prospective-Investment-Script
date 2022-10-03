@@ -336,6 +336,7 @@ class AutoProspectiveInvestment:
         """ 不期而遇 """
         touch('出发前往')
         sleep(1)
+        try_touch('确定-钥匙')
         touch(NOP, times=5)
         sleep(1)
         res = check(self.option_list)
@@ -353,6 +354,7 @@ class AutoProspectiveInvestment:
         """ 得偿所愿 """
         touch('出发前往')
         sleep(1)
+        try_touch('确定-钥匙')
         touch(NOP, times=2)
         sleep(1)
         touch('收藏品')
