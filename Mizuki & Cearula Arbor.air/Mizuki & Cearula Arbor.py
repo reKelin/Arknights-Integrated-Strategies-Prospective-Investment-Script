@@ -8,14 +8,16 @@ logging.getLogger("airtest").setLevel(logging.INFO)
 air.auto_setup(__file__)
 air.ST.FIND_TIMEOUT_TMP = 1
 # air.ST.SAVE_IMAGE = False
+air.ST.OPDELAY = json.load(open('default_setting.json',
+                                encoding='utf-8'))['default_sleep_time']
+''' 每一次点击后默认等待时间：如果设备太卡，可以调大一点 '''
+
+delay = air.ST.OPDELAY
 
 resolution = air.G.DEVICE.get_current_resolution()
 ''' 默认分辨率 = 1920 * 1080 '''
 NOP = (700, 900)
 ''' 无操作 / 确定 '''
-default_sleep_time = json.load(open('default_setting.json',
-                                    encoding='utf-8'))['default_sleep_time']
-''' 默认等待时间：如果设备太卡，可以调大一点 '''
 
 
 def trans_position(p):
@@ -23,14 +25,13 @@ def trans_position(p):
     return (p[0] * resolution[0] / 1920, p[1] * resolution[1] / 1080)
 
 
-def touch(p, times=1):
+def touch(p, **kwargs):
     if isinstance(p, str):
-        air.touch(template(p), times=times)
+        air.touch(template(p), **kwargs)
     elif isinstance(p, tuple):
-        air.touch(trans_position(p), times=times)
+        air.touch(trans_position(p), **kwargs)
     else:
-        air.touch(p, times=times)
-    sleep(default_sleep_time)
+        air.touch(p, **kwargs)
 
 
 def exists(img):
@@ -52,15 +53,12 @@ def swipe(p1, p2, duration=1):
     air.swipe(p1, p2, duration)
 
 
-def template(name, threshold=None, rgb=False, target_pos=0):
-    return air.Template(r'%s' % ('images\\' + name + '.png'),
-                        threshold=threshold,
-                        rgb=rgb,
-                        target_pos=target_pos,
-                        resolution=[1920, 1080])
+def template(name, **kwargs):
+    kwargs['resolution'] = [1920, 1080]
+    return air.Template(r'%s' % ('images\\' + name + '.png'), **kwargs)
 
 
-def sleep(time=default_sleep_time):
+def sleep(time=air.ST.OPDELAY):
     air.sleep(time)
 
 
@@ -119,11 +117,8 @@ class AutoProspectiveInvestment:
             info['class_img'] = template('职业-' + info['class'], threshold=.3)
         self.squad = squad
 
-        def trans(a, prefix, rgb=False, targat=0):
-            return {
-                name: template(prefix + name, rgb=rgb, target_pos=targat)
-                for name in a
-            }
+        def trans(a, prefix, **kwargs):
+            return {name: template(prefix + name, **kwargs) for name in a}
 
         self.operation_task = json.load(
             open('operation_tasks.json', encoding='utf-8'))
@@ -142,7 +137,7 @@ class AutoProspectiveInvestment:
         ''' 关卡名称列表 '''
 
         recruitment = ['近卫', '辅助', '医疗']
-        self.recruitment = trans(recruitment, '招募券-', targat=8)
+        self.recruitment = trans(recruitment, '招募券-', target_pos=8, threshold=.9)
         ''' 招募券 '''
 
     def run(self):
@@ -154,7 +149,7 @@ class AutoProspectiveInvestment:
             # 开始探索
             while not try_touch(start):
                 touch(NOP, times=5)
-            sleep(default_sleep_time * 2)
+            sleep(delay * 2)
             # 如果存在更多支援
             if support:
                 if exists('更多支援'):
@@ -164,16 +159,13 @@ class AutoProspectiveInvestment:
                 support = False
             # 选择指挥分队
             touch(team)  # 指挥分队
-            sleep(default_sleep_time)
             touch(team)  # 确认
-            sleep(default_sleep_time)
             # 选择取长补短
             touch(combination)  # 取长补短
-            sleep(default_sleep_time)
             touch(combination)  # 确认
             # 招募干员
             self.recruit_operators()
-            sleep(default_sleep_time * 2)
+            sleep(delay * 2)
             # 探索海洋
             touch((1800, 540))  # 探索海洋
             # 调整编队
@@ -215,7 +207,6 @@ class AutoProspectiveInvestment:
                 op = operator['recruit']
                 while cnt < 4 and not try_touch(op):
                     swipe_screen()
-                    sleep(default_sleep_time)
                     cnt += 1
                 if cnt >= 4:
                     assist = True
@@ -265,7 +256,7 @@ class AutoProspectiveInvestment:
         return
 
     def next_step(self):
-        sleep(default_sleep_time * 4)
+        sleep(delay * 5)
         for name in check(self.node_list):
             touch(self.node_list[name])
             if name == '不期而遇':
@@ -296,7 +287,7 @@ class AutoProspectiveInvestment:
         try_touch('确定-钥匙')
         speed = template('2倍速')
         air.wait(speed)
-        sleep(default_sleep_time * 4)
+        sleep(delay * 4)
         air.touch(speed)
         cost = 10
         for op in self.squad:
@@ -309,10 +300,10 @@ class AutoProspectiveInvestment:
             task = self.operation_task[res][op['class']]  # 某职业干员在该关卡的操作信息
             place = trans_position(task['place'])
             air.swipe(position, place,
-                      duration=default_sleep_time / 2)  # 拖干员到位置
+                      duration=delay / 2)  # 拖干员到位置
             dx, dy = task['direction']
             dst = (place[0] + dx * 200, place[1] + dy * 200)
-            air.swipe(place, dst, duration=default_sleep_time / 3)  # 设置朝向
+            air.swipe(place, dst, duration=delay / 3)  # 设置朝向
             cost += 8 - op['cost']
             if op['skill_click']:
                 cost += op['skill_cd'] + 2
@@ -378,13 +369,13 @@ class AutoProspectiveInvestment:
         """ 兴致盎然 """
         touch('出发前往')
         sleep(1)
-        touch(NOP, times=5)
+        touch(NOP, times=15)
         touch('选择-离开')
         touch('确定-选择')
-        touch(NOP, times=5)
+        touch(NOP, times=15)
         touch('选择-源石锭')
         touch('确定-选择')
-        touch(NOP, times=5)
+        touch(NOP, times=15)
 
     def excounter_regional_entrustment(self):
         """ 地区委托 """
@@ -402,11 +393,8 @@ class AutoProspectiveInvestment:
         sleep(1)
         if try_touch('前瞻性投资系统'):
             touch('投资入口')
-            touch((1400, 740), times=100)  # 确认投资
+            touch((1400, 740), times=60)  # 确认投资
 
 
 script = AutoProspectiveInvestment()
 script.run()
-
-
-
