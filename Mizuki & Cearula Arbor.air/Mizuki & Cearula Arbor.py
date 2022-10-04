@@ -159,15 +159,18 @@ class AutoProspectiveInvestment:
                 support = False
             # 选择指挥分队
             touch(team)  # 指挥分队
+            sleep(delay)
             touch(team)  # 确认
             # 选择取长补短
             touch(combination)  # 取长补短
+            sleep(delay)
             touch(combination)  # 确认
             # 招募干员
             self.recruit_operators()
             sleep(delay * 2)
             # 探索海洋
             touch((1800, 540))  # 探索海洋
+            sleep(delay * 2)
             # 调整编队
             self.adjust_squad()
             # 第一关
@@ -300,10 +303,10 @@ class AutoProspectiveInvestment:
             task = self.operation_task[res][op['class']]  # 某职业干员在该关卡的操作信息
             place = trans_position(task['place'])
             air.swipe(position, place,
-                      duration=delay / 2)  # 拖干员到位置
+                      duration=delay)  # 拖干员到位置
             dx, dy = task['direction']
             dst = (place[0] + dx * 200, place[1] + dy * 200)
-            air.swipe(place, dst, duration=delay / 3)  # 设置朝向
+            air.swipe(place, dst, duration=delay / 2)  # 设置朝向
             cost += 8 - op['cost']
             if op['skill_click']:
                 cost += op['skill_cd'] + 2
