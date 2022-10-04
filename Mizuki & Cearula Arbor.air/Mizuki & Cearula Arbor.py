@@ -53,12 +53,9 @@ def swipe(p1, p2, duration=1):
     air.swipe(p1, p2, duration)
 
 
-def template(name, threshold=None, rgb=False, target_pos=0):
-    return air.Template(r'%s' % ('images\\' + name + '.png'),
-                        threshold=threshold,
-                        rgb=rgb,
-                        target_pos=target_pos,
-                        resolution=[1920, 1080])
+def template(name, **kwargs):
+    kwargs['resolution'] = [1920, 1080]
+    return air.Template(r'%s' % ('images\\' + name + '.png'), **kwargs)
 
 
 def sleep(time=air.ST.OPDELAY):
@@ -120,11 +117,8 @@ class AutoProspectiveInvestment:
             info['class_img'] = template('职业-' + info['class'], threshold=.3)
         self.squad = squad
 
-        def trans(a, prefix, rgb=False, targat=0):
-            return {
-                name: template(prefix + name, rgb=rgb, target_pos=targat)
-                for name in a
-            }
+        def trans(a, prefix, **kwargs):
+            return {name: template(prefix + name, **kwargs) for name in a}
 
         self.operation_task = json.load(
             open('operation_tasks.json', encoding='utf-8'))
@@ -143,7 +137,7 @@ class AutoProspectiveInvestment:
         ''' 关卡名称列表 '''
 
         recruitment = ['近卫', '辅助', '医疗']
-        self.recruitment = trans(recruitment, '招募券-', targat=8)
+        self.recruitment = trans(recruitment, '招募券-', target_pos=8, threshold=.9)
         ''' 招募券 '''
 
     def run(self):
@@ -170,7 +164,6 @@ class AutoProspectiveInvestment:
             touch(combination)  # 取长补短
             touch(combination)  # 确认
             # 招募干员
-            sleep(delay)
             self.recruit_operators()
             sleep(delay * 2)
             # 探索海洋
@@ -350,10 +343,10 @@ class AutoProspectiveInvestment:
         else:
             touch(self.option_list[res[0]])
         touch('确定-选择')
-        touch(NOP, duration=1)
+        touch(NOP, times=15)
         if len(res) == 0 or res == '问号':
             self.quit_recruit()
-            touch(NOP, duration=1)
+            touch(NOP, times=15)
 
     def excounter_wish_fulfillment(self):
         """ 得偿所愿 """
@@ -366,23 +359,23 @@ class AutoProspectiveInvestment:
         touch('确定-选择')
         air.wait(template('确定-投掷'))
         touch('确定-投掷')
-        touch(NOP, duration=1)
+        touch(NOP, times=15)
         self.quit_recruit()
-        touch(NOP, duration=1)
+        touch(NOP, times=15)
         self.quit_recruit()
-        touch(NOP, duration=1)
+        touch(NOP, times=15)
 
     def downtime_recreation(self):
         """ 兴致盎然 """
         touch('出发前往')
         sleep(1)
-        touch(NOP, duration=.5)
+        touch(NOP, times=15)
         touch('选择-离开')
         touch('确定-选择')
-        touch(NOP, duration=.5)
+        touch(NOP, times=15)
         touch('选择-源石锭')
         touch('确定-选择')
-        touch(NOP, duration=.5)
+        touch(NOP, times=15)
 
     def excounter_regional_entrustment(self):
         """ 地区委托 """
@@ -392,7 +385,7 @@ class AutoProspectiveInvestment:
         sleep(1)
         touch('选择-离开')
         touch('确定-选择')
-        touch(NOP, duration=1)
+        touch(NOP, times=15)
 
     def rogue_trader(self):
         """  诡意行商前瞻性投资 """
@@ -400,7 +393,7 @@ class AutoProspectiveInvestment:
         sleep(1)
         if try_touch('前瞻性投资系统'):
             touch('投资入口')
-            touch((1400, 740), duration=5)  # 确认投资
+            touch((1400, 740), times=60)  # 确认投资
 
 
 script = AutoProspectiveInvestment()
