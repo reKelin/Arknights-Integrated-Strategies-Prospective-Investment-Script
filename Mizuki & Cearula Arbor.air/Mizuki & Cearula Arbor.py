@@ -164,9 +164,12 @@ class AutoProspectiveInvestment:
                 support = False
             # 选择指挥分队
             touch(team)  # 指挥分队
+            sleep(default_sleep_time)
             touch(team)  # 确认
+            sleep(default_sleep_time)
             # 选择取长补短
             touch(combination)  # 取长补短
+            sleep(default_sleep_time)
             touch(combination)  # 确认
             # 招募干员
             self.recruit_operators()
@@ -212,6 +215,7 @@ class AutoProspectiveInvestment:
                 op = operator['recruit']
                 while cnt < 4 and not try_touch(op):
                     swipe_screen()
+                    sleep(default_sleep_time)
                     cnt += 1
                 if cnt >= 4:
                     assist = True
@@ -398,9 +402,11 @@ class AutoProspectiveInvestment:
         sleep(1)
         if try_touch('前瞻性投资系统'):
             touch('投资入口')
-            touch((1400, 740), times=50)  # 确认投资
+            touch((1400, 740), times=100)  # 确认投资
 
 
 script = AutoProspectiveInvestment()
 script.run()
+
+
 
